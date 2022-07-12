@@ -1,30 +1,28 @@
-#include <uart_lp.h>
-
-#include <drivers/gpio.h>
-#include <drivers/uart.h>
-#include <pm/device.h>
-#include <zephyr.h>
-
 #include <stdio.h>
 #include <string.h>
 
+#include <drivers/gpio.h>
+#include <drivers/uart.h>
 #include <logging/log.h>
-LOG_MODULE_REGISTER(lpuart, CONFIG_UART_LP_LOG_LEVEL);
+#include <pm/device.h>
+#include <uart_lp.h>
+#include <zephyr.h>
+LOG_MODULE_REGISTER(uart_lp, CONFIG_UART_LP_LOG_LEVEL);
 
 // extract from device tree
-#define DT_DRV_COMPAT irnas_lpuart
+#define DT_DRV_COMPAT irnas_uart_lp
 
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(uart)
-#define UART_LABEL DT_INST_BUS_LABEL(0)
+#define UART_LABEL   DT_INST_BUS_LABEL(0)
 #define SIGNAL_LABEL DT_INST_GPIO_LABEL(0, signal_gpios)
-#define SIGNAL_PIN DT_INST_GPIO_PIN(0, signal_gpios)
+#define SIGNAL_PIN   DT_INST_GPIO_PIN(0, signal_gpios)
 #define SIGNAL_FLAGS DT_INST_GPIO_FLAGS(0, signal_gpios)
 #else
-#error "No lpuart defined on any uart in dts"
+#error "No uart_lp defined on any uart in dts"
 #endif
 
 // extract from Kconfig
-#define BUF_SIZE (CONFIG_UART_LP_BUF_SIZE + 2)
+#define BUF_SIZE   (CONFIG_UART_LP_BUF_SIZE + 2)
 #define TERMINATOR CONFIG_UART_LP_TERMINATOR
 
 static struct gpio_callback signal_ext_int_cb;
@@ -81,20 +79,17 @@ void signal_interrupt_configure(void)
 {
 	gpio_dev = device_get_binding(SIGNAL_LABEL);
 
-	int err = gpio_pin_configure(gpio_dev, SIGNAL_PIN,
-				     GPIO_INPUT | SIGNAL_FLAGS);
+	int err = gpio_pin_configure(gpio_dev, SIGNAL_PIN, GPIO_INPUT | SIGNAL_FLAGS);
 	if (err) {
 		LOG_ERR("gpio_pin_configure err: %d", err);
 	}
 
-	err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN,
-					   GPIO_INT_LEVEL_ACTIVE);
+	err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN, GPIO_INT_LEVEL_ACTIVE);
 	if (err) {
 		LOG_ERR("gpio_pin_interrupt_configure err: %d", err);
 	}
 
-	gpio_init_callback(&signal_ext_int_cb, signal_interrupt_cb_fun,
-			   BIT(SIGNAL_PIN));
+	gpio_init_callback(&signal_ext_int_cb, signal_interrupt_cb_fun, BIT(SIGNAL_PIN));
 	err = gpio_add_callback(gpio_dev, &signal_ext_int_cb);
 	if (err) {
 		LOG_ERR("gpio_add_callback err: %d", err);
@@ -106,20 +101,18 @@ void signal_interrupt_set_to_input(bool interrupt_active)
 {
 	int err;
 
-	err = gpio_pin_configure(gpio_dev, SIGNAL_PIN,
-				 GPIO_INPUT | SIGNAL_FLAGS);
+	err = gpio_pin_configure(gpio_dev, SIGNAL_PIN, GPIO_INPUT | SIGNAL_FLAGS);
 	if (err) {
 		LOG_ERR("gpio_pin_configure err: %d", err);
 	}
 	if (interrupt_active) {
-		err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN,
-						   GPIO_INT_LEVEL_ACTIVE);
+		err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN, GPIO_INT_LEVEL_ACTIVE);
 		if (err) {
 			LOG_ERR("gpio_pin_interrupt_configure err: %d", err);
 		}
 	} else {
-		int err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN,
-						       GPIO_INT_LEVEL_INACTIVE);
+		int err =
+			gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN, GPIO_INT_LEVEL_INACTIVE);
 		if (err) {
 			LOG_ERR("gpio_pin_interrupt_configure err: %d", err);
 		}
@@ -136,13 +129,11 @@ void signal_interrupt_set_to_output(int value)
 	if (err) {
 		LOG_ERR("gpio_remove_callback err: %d", err);
 	}
-	err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN,
-					   GPIO_INT_DISABLE);
+	err = gpio_pin_interrupt_configure(gpio_dev, SIGNAL_PIN, GPIO_INT_DISABLE);
 	if (err) {
 		LOG_ERR("gpio_pin_interrupt_configure err: %d", err);
 	}
-	err = gpio_pin_configure(gpio_dev, SIGNAL_PIN,
-				 GPIO_OUTPUT | SIGNAL_FLAGS);
+	err = gpio_pin_configure(gpio_dev, SIGNAL_PIN, GPIO_OUTPUT | SIGNAL_FLAGS);
 	if (err) {
 		LOG_ERR("gpio_pin_configure err: %d", err);
 	}
@@ -194,8 +185,7 @@ void uart_cb(const struct device *dev, void *x)
 		}
 
 		int data_length =
-			uart_fifo_read(dev, &sd->rx->buffer[sd->rx->len],
-				       BUF_SIZE - sd->rx->len);
+			uart_fifo_read(dev, &sd->rx->buffer[sd->rx->len], BUF_SIZE - sd->rx->len);
 		sd->rx->len += data_length;
 		// LOG_DBG("RECEIVED BUFFER: %s, LEN: %d", sd->rx->buffer,
 		// sd->rx->len);

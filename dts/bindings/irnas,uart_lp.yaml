@@ -1,0 +1,28 @@
+# Copyright (c) 2022 IRNAS d.o.o
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  Driver for actual lpw power uart
+  Example definition in devicetree:
+
+  uart1 {
+    // ...
+
+    uart_lp {
+      compatible = "irnas,uart_lp";
+      status = "okay";
+      label = "UART_LP";
+      signal-gpios = <&gpio0 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+    };
+  };
+
+compatible: "irnas,uart_lp"
+
+include: uart-device.yaml
+
+properties:
+  signal-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      GPIO responsible for signalling the enabling of uart
