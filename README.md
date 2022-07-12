@@ -22,7 +22,7 @@ If you already have a NCS setup you can follow these steps:
       repo-path: irnas-lpuart-driver
       path: irnas/irnas-lpuart-driver
       remote: irnas
-      revision: master
+      revision: v1.0.0
     ```
 
 3. Then run `west update` in your freshly created bash/command prompt session.
@@ -31,12 +31,7 @@ If you already have a NCS setup you can follow these steps:
 
 ```dts
 &uart1 {
-    status = "okay";
-    compatible = "nordic,nrf-uarte";
-    current-speed = <115200>;
-    pinctrl-0 = <&uart1_default>;
-    pinctrl-1 = <&uart1_sleep>;
-    pinctrl-names = "default", "sleep";
+    // ...
 
     lpuart {
         compatible = "irnas,lpuart";
@@ -48,3 +43,5 @@ If you already have a NCS setup you can follow these steps:
 };
 
 ```
+
+6. Check out the basic sample in `samples/basic` to see a correct `prj.conf`, since the UART in use must be configured to be interrupt driven.
