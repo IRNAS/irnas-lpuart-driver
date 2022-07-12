@@ -1,0 +1,12 @@
+tags
+tags.lock
+*.swp
+sanity-out
+build*
+.vscode
+__pycache__
+.envrc
+*.PDF
+*.pdf
+.cache
+generated

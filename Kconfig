@@ -1,0 +1,5 @@
+menu "irnas-lpuart-driver"
+
+rsource "drivers/Kconfig"
+
+endmenu

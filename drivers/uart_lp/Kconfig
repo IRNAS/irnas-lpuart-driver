@@ -1,0 +1,29 @@
+
+menuconfig UART_LP
+	bool "LP UART wrapper"
+	depends on PM_DEVICE
+	help
+	  Enable LP UART wrapper for easier use of the lp-uart
+
+if UART_LP
+
+config UART_LP_BUF_SIZE
+	int "LP UART buffer size"
+	default 64
+	help
+	  The LP UART wrapper buffer size in bytes
+
+config UART_LP_TERMINATOR
+	hex "Line terminator to use"
+	default 0x0A
+	help
+	  The line terminator to use. This character must not appear inside the strings that are sent.
+	  The default value of 0x0A is the new line character.
+	  This character is appended automatically to the end of the string and removed when calling the
+	  receiver callback.
+
+module = UART_LP
+module-str = uart-lp
+source "subsys/logging/Kconfig.template.log_config"
+
+endif  # UART_LP
